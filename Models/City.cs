@@ -1,5 +1,8 @@
-public class City
+namespace PayrollSystem.Models  
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public class City
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
 }

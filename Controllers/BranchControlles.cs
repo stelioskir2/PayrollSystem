@@ -1,43 +1,29 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using PayrollSystem.Services.Interfaces;
+using PayrollSystem.DTOs;
 
 [ApiController]
 [Route("api/[controller]")]
 public class BranchController : ControllerBase
 {
-    private readonly PayrollContext _db;
+    private readonly IBranchService _branchService;
 
-    public BranchController(PayrollContext db)
+    public BranchController(IBranchService branchService)
     {
-        _db = db;
+        _branchService = branchService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var branches = await _db.Branches
-            .Select(b => new BranchResponseDto
-            {
-                Id = b.Id,
-                Area = b.Area,
-                CityName = b.City.Name
-            })
-            .ToListAsync();
+        var branches = await _branchService.GetAllAsync();
         return Ok(branches);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var branch = await _db.Branches
-            .Where(b => b.Id == id)
-            .Select(b => new BranchResponseDto
-            {
-                Id = b.Id,
-                Area = b.Area,
-                CityName = b.City.Name
-            })
-            .FirstOrDefaultAsync();
+        var branch = await _branchService.GetByIdAsync(id);
         if (branch == null)
             return NotFound("Το παράρτημα δεν βρέθηκε!");
         return Ok(branch);
@@ -46,24 +32,18 @@ public class BranchController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateBranchDto dto)
     {
-        var city = await _db.Cities
-            .FindAsync(dto.CityId);
-        if (city == null)
+        var branch = await _branchService.CreateAsync(dto);
+        if (branch == null)
             return NotFound("Η πόλη δεν βρέθηκε!");
-        var branch = new Branch { Area = dto.Area , CityId = dto.CityId};
-        _db.Branches.Add(branch);
-        await _db.SaveChangesAsync();
-        return Ok(new BranchResponseDto {Id = branch.Id , Area = branch.Area, CityName = city.Name});
+        return Ok(branch);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var branch = await _db.Branches.FindAsync(id);
-        if (branch == null)
-            return NotFound("Το παράρτημα δεν βρέθηκε!");
-        _db.Branches.Remove(branch);
-        await _db.SaveChangesAsync();
+        var branch = await _branchService.DeleteAsync(id);
+        if (!branch)
+            return NotFound("Το παραρτημα δεν βρέθηκε δεν βρέθηκε!");
         return Ok("Διαγράφηκε!");
     }
 }

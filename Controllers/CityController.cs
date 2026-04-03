@@ -1,30 +1,29 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using PayrollSystem.Services.Interfaces;
+using PayrollSystem.DTOs;
+
 
 [ApiController]
 [Route("api/[controller]")]
 public class CityController : ControllerBase
 {
-    private readonly PayrollContext _db;
-
-    public CityController(PayrollContext db)
+    private readonly ICityService _cityService;
+    public CityController(ICityService cityService)
     {
-        _db = db;
-    }
+        _cityService = cityService;
+    }   
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var cities = await _db.Cities
-            .ToListAsync();
+        var cities = await _cityService.GetAllAsync();
         return Ok(cities);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var city = await _db.Cities
-            .FindAsync(id);
+        var city = await _cityService.GetByIdAsync(id);
         if (city == null)
             return NotFound("Η πόλη δεν βρέθηκε!");
         return Ok(city);
@@ -33,20 +32,16 @@ public class CityController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateCityDto dto)
     {
-        var city = new City { Name = dto.Name };
-        _db.Cities.Add(city);
-        await _db.SaveChangesAsync();
-        return Ok(new CityResponseDto { Id = city.Id, Name = city.Name });
+        var city = await _cityService.CreateAsync(dto);
+        return Ok(city);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var city = await _db.Cities.FindAsync(id);
-        if (city == null)
+        var found = await _cityService.DeleteAsync(id);
+        if (!found)
             return NotFound("Η πόλη δεν βρέθηκε!");
-        _db.Cities.Remove(city);
-        await _db.SaveChangesAsync();
-        return Ok("Διαγράφηκε!");
+        return Ok("Διαγράφηκε!");       
     }
 }

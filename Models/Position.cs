@@ -1,5 +1,8 @@
-public class Position
+namespace PayrollSystem.Models 
 {
-    public int Id { get; set; }
-    public string Title { get; set; }
+    public class Position
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+    }
 }

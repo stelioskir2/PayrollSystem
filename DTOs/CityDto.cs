@@ -1,10 +1,13 @@
-public class CreateCityDto
+namespace PayrollSystem.DTOs 
 {
-    public string Name { get; set; }
-}
+    public class CreateCityDto
+    {
+        public string Name { get; set; }
+    }
 
-public class CityResponseDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public class CityResponseDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
 }

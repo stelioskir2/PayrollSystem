@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using PayrollSystem.Services.Interfaces;
+using PayrollSystem.Services.Implementations;
+using PayrollSystem.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,10 @@ builder.Services.AddDbContext<PayrollContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleDB")));
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<ICityService, CityService>();
+builder.Services.AddScoped<IBranchService, BranchService>();
+builder.Services.AddScoped<IPositionService, PositionService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 var app = builder.Build();
 

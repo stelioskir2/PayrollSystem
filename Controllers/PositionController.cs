@@ -1,31 +1,30 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using PayrollSystem.Services.Interfaces;
+using PayrollSystem.DTOs;
 
 [ApiController]
 [Route("api/[controller]")]
 
 public class PositionController : ControllerBase
 {
-    private readonly PayrollContext _db;
+    private readonly IPositionService _positionService;
 
-    public PositionController(PayrollContext db)
+    public PositionController(IPositionService positionService)
     {
-        _db = db;
+        _positionService = positionService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var positions = await _db.Positions
-            .ToListAsync();
+        var positions = await _positionService.GetAllAsync();
         return Ok(positions);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var position = await _db.Positions
-            .FindAsync(id);
+        var position = await _positionService.GetByIdAsync(id);
         if (position == null)
             return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
         return Ok(position);
@@ -34,33 +33,25 @@ public class PositionController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreatePositionDto dto)
     {
-        var position = new Position{Title = dto.Title};
-        _db.Positions.Add(position);
-        await _db.SaveChangesAsync();
-        return Ok(new PositionResponseDto {Id = position.Id , Title = position.Title});
+        var position = await _positionService.CreateAsync(dto);
+        return Ok(position);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(int id , UpdatePositionDto dto)
     {
-        var position = await _db.Positions
-            .FindAsync(id);
-        if (position == null)
+        var position = await _positionService.PutAsync(id, dto);
+        if (!position)
             return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
-        position.Title = dto.Title;
-        await _db.SaveChangesAsync();
         return Ok("Ενημερώθηκε!");
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var position = await _db.Positions
-            .FindAsync(id);
-        if (position == null)
+        var position = await _positionService.DeleteAsync(id);
+        if (!position)
             return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
-        _db.Positions.Remove(position);
-        await _db.SaveChangesAsync();
         return Ok("Διαγράφηκε!");
     }
 }
