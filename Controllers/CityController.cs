@@ -16,11 +16,6 @@ public class CityController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var cities = await _db.Cities
-            .Select(c => new CityResponseDto
-            {
-                Id = c.Id,
-                Name = c.Name
-            })
             .ToListAsync();
         return Ok(cities);
     }
@@ -29,13 +24,7 @@ public class CityController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var city = await _db.Cities
-            .Where(c => c.Id == id)
-            .Select(c => new CityResponseDto
-            {
-                Id = c.Id,
-                Name = c.Name
-            })
-            .FirstOrDefaultAsync();
+            .FindAsync(id);
         if (city == null)
             return NotFound("Η πόλη δεν βρέθηκε!");
         return Ok(city);

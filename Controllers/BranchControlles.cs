@@ -44,14 +44,16 @@ public class BranchController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(Branch branch)
+    public async Task<IActionResult> Create(CreateBranchDto dto)
     {
-        var city = await _db.Cities.FindAsync(branch.CityId);
+        var city = await _db.Cities
+            .FindAsync(dto.CityId);
         if (city == null)
             return NotFound("Η πόλη δεν βρέθηκε!");
+        var branch = new Branch { Area = dto.Area , CityId = dto.CityId};
         _db.Branches.Add(branch);
         await _db.SaveChangesAsync();
-        return Ok(branch);
+        return Ok(new BranchResponseDto {Id = branch.Id , Area = branch.Area, CityName = city.Name});
     }
 
     [HttpDelete("{id}")]

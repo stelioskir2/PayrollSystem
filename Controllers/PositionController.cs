@@ -17,11 +17,6 @@ public class PositionController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var positions = await _db.Positions
-            .Select(p => new PositionResponseDto
-            {
-                Id = p.Id,
-                Title = p.Title
-            })
             .ToListAsync();
         return Ok(positions);
     }
@@ -30,13 +25,7 @@ public class PositionController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var position = await _db.Positions
-            .Where(p => p.Id == id)
-            .Select(p => new PositionResponseDto
-            {
-                Id = id,
-                Title = p.Title
-            })
-            .FirstOrDefaultAsync();
+            .FindAsync(id);
         if (position == null)
             return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
         return Ok(position);
@@ -55,7 +44,7 @@ public class PositionController : ControllerBase
     public async Task<IActionResult> Put(int id , UpdatePositionDto dto)
     {
         var position = await _db.Positions
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .FindAsync(id);
         if (position == null)
             return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
         position.Title = dto.Title;
@@ -67,7 +56,7 @@ public class PositionController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var position = await _db.Positions
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .FindAsync(id);
         if (position == null)
             return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
         _db.Positions.Remove(position);
