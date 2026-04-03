@@ -17,6 +17,11 @@ public class PositionController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var positions = await _db.Positions
+            .Select(p => new PositionResponseDto
+            {
+                Id = p.Id,
+                Title = p.Title
+            })
             .ToListAsync();
         return Ok(positions);
     }
@@ -25,28 +30,35 @@ public class PositionController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var position = await _db.Positions
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .Where(p => p.Id == id)
+            .Select(p => new PositionResponseDto
+            {
+                Id = id,
+                Title = p.Title
+            })
+            .FirstOrDefaultAsync();
         if (position == null)
             return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
         return Ok(position);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(Position position)
+    public async Task<IActionResult> Create(CreatePositionDto dto)
     {
+        var position = new Position{Title = dto.Title};
         _db.Positions.Add(position);
         await _db.SaveChangesAsync();
-        return Ok(position);
+        return Ok(new PositionResponseDto {Id = position.Id , Title = position.Title});
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, Position updated_position)
+    public async Task<IActionResult> Put(int id , UpdatePositionDto dto)
     {
         var position = await _db.Positions
             .FirstOrDefaultAsync(p => p.Id == id);
         if (position == null)
             return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
-        position.Title = updated_position.Title;
+        position.Title = dto.Title;
         await _db.SaveChangesAsync();
         return Ok("Ενημερώθηκε!");
     }

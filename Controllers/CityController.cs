@@ -15,25 +15,39 @@ public class CityController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var cities = await _db.Cities.ToListAsync();
+        var cities = await _db.Cities
+            .Select(c => new CityResponseDto
+            {
+                Id = c.Id,
+                Name = c.Name
+            })
+            .ToListAsync();
         return Ok(cities);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var city = await _db.Cities.FindAsync(id);
+        var city = await _db.Cities
+            .Where(c => c.Id == id)
+            .Select(c => new CityResponseDto
+            {
+                Id = c.Id,
+                Name = c.Name
+            })
+            .FirstOrDefaultAsync();
         if (city == null)
             return NotFound("Η πόλη δεν βρέθηκε!");
         return Ok(city);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(City city)
+    public async Task<IActionResult> Create(CreateCityDto dto)
     {
+        var city = new City { Name = dto.Name };
         _db.Cities.Add(city);
         await _db.SaveChangesAsync();
-        return Ok(city);
+        return Ok(new CityResponseDto { Id = city.Id, Name = city.Name });
     }
 
     [HttpDelete("{id}")]

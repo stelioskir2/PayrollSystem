@@ -16,7 +16,12 @@ public class BranchController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var branches = await _db.Branches
-            .Include(b => b.City)
+            .Select(b => new BranchResponseDto
+            {
+                Id = b.Id,
+                Area = b.Area,
+                CityName = b.City.Name
+            })
             .ToListAsync();
         return Ok(branches);
     }
@@ -25,8 +30,14 @@ public class BranchController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var branch = await _db.Branches
-            .Include(b => b.City)
-            .FirstOrDefaultAsync(b => b.Id == id);
+            .Where(b => b.Id == id)
+            .Select(b => new BranchResponseDto
+            {
+                Id = b.Id,
+                Area = b.Area,
+                CityName = b.City.Name
+            })
+            .FirstOrDefaultAsync();
         if (branch == null)
             return NotFound("Το παράρτημα δεν βρέθηκε!");
         return Ok(branch);
