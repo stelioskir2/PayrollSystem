@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PayrollSystem.Services.Interfaces;
 using PayrollSystem.DTOs;
+using PayrollSystem.Helpers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -18,7 +19,7 @@ public class PositionController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var positions = await _positionService.GetAllAsync();
-        return Ok(positions);
+        return Ok(ApiResponse.Ok(positions));
     }
 
     [HttpGet("{id}")]
@@ -26,15 +27,15 @@ public class PositionController : ControllerBase
     {
         var position = await _positionService.GetByIdAsync(id);
         if (position == null)
-            return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
-        return Ok(position);
+            return NotFound(ApiResponse.NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!"));
+        return Ok(ApiResponse.Ok(position));
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(CreatePositionDto dto)
     {
         var position = await _positionService.CreateAsync(dto);
-        return Ok(position);
+        return Ok(ApiResponse.Ok(position));
     }
 
     [HttpPut("{id}")]
@@ -42,8 +43,8 @@ public class PositionController : ControllerBase
     {
         var position = await _positionService.PutAsync(id, dto);
         if (!position)
-            return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
-        return Ok("Ενημερώθηκε!");
+            return NotFound(ApiResponse.NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!"));
+        return Ok(ApiResponse.Ok("Ενημερώθηκε!"));
     }
 
     [HttpDelete("{id}")]
@@ -51,7 +52,7 @@ public class PositionController : ControllerBase
     {
         var position = await _positionService.DeleteAsync(id);
         if (!position)
-            return NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!");
-        return Ok("Διαγράφηκε!");
+            return NotFound(ApiResponse.NotFound("Η συγκεκριμένη θέση δεν βρέθηκε!"));
+        return Ok(ApiResponse.Ok("Διαγράφηκε!"));
     }
 }

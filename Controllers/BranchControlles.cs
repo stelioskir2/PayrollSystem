@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PayrollSystem.Services.Interfaces;
 using PayrollSystem.DTOs;
+using PayrollSystem.Helpers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -17,7 +18,7 @@ public class BranchController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var branches = await _branchService.GetAllAsync();
-        return Ok(branches);
+        return Ok(ApiResponse.Ok(branches));
     }
 
     [HttpGet("{id}")]
@@ -25,8 +26,8 @@ public class BranchController : ControllerBase
     {
         var branch = await _branchService.GetByIdAsync(id);
         if (branch == null)
-            return NotFound("Το παράρτημα δεν βρέθηκε!");
-        return Ok(branch);
+            return NotFound(ApiResponse.NotFound("Το παράρτημα δεν βρέθηκε!"));
+        return Ok(ApiResponse.Ok(branch));
     }
 
     [HttpPost]
@@ -34,8 +35,8 @@ public class BranchController : ControllerBase
     {
         var branch = await _branchService.CreateAsync(dto);
         if (branch == null)
-            return NotFound("Η πόλη δεν βρέθηκε!");
-        return Ok(branch);
+            return NotFound(ApiResponse.NotFound("Η πόλη δεν βρέθηκε!"));
+        return Ok(ApiResponse.Ok(branch));
     }
 
     [HttpDelete("{id}")]
@@ -43,7 +44,7 @@ public class BranchController : ControllerBase
     {
         var branch = await _branchService.DeleteAsync(id);
         if (!branch)
-            return NotFound("Το παραρτημα δεν βρέθηκε δεν βρέθηκε!");
-        return Ok("Διαγράφηκε!");
+            return NotFound(ApiResponse.NotFound("Το παραρτημα δεν βρέθηκε!"));
+        return Ok(ApiResponse.Ok("Διαγράφηκε!"));
     }
 }

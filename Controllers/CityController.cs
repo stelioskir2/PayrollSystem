@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PayrollSystem.Services.Interfaces;
 using PayrollSystem.DTOs;
+using PayrollSystem.Helpers; 
 
 
 [ApiController]
@@ -17,7 +18,7 @@ public class CityController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var cities = await _cityService.GetAllAsync();
-        return Ok(cities);
+        return Ok(ApiResponse.Ok(cities));
     }
 
     [HttpGet("{id}")]
@@ -25,15 +26,15 @@ public class CityController : ControllerBase
     {
         var city = await _cityService.GetByIdAsync(id);
         if (city == null)
-            return NotFound("Η πόλη δεν βρέθηκε!");
-        return Ok(city);
+            return NotFound(ApiResponse.NotFound("Η πόλη δεν βρέθηκε!"));
+        return Ok(ApiResponse.Ok(city));
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(CreateCityDto dto)
     {
         var city = await _cityService.CreateAsync(dto);
-        return Ok(city);
+        return Ok(ApiResponse.Ok(city));
     }
 
     [HttpDelete("{id}")]
@@ -41,7 +42,7 @@ public class CityController : ControllerBase
     {
         var found = await _cityService.DeleteAsync(id);
         if (!found)
-            return NotFound("Η πόλη δεν βρέθηκε!");
-        return Ok("Διαγράφηκε!");       
+            return NotFound(ApiResponse.NotFound("Η πόλη δεν βρέθηκε!"));
+        return Ok(ApiResponse.Ok("Διαγράφηκε!"));      
     }
 }
